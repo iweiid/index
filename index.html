@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Я ЛЮБЛЮ ТЕБЯ ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            transition: background-color 0.3s;
+        }
+
+        .heart-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .heart {
+            width: 100px;
+            height: 90px;
+            position: relative;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: "";
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            background-color: #ff4d4d;
+            border-radius: 50px 50px 0 0;
+            transition: background-color 0.2s;
+        }
+
+        .heart::before {
+            left: 50px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        .heart-btn:hover .heart {
+            transform: scale(1.1);
+        }
+
+        .heart-btn:active .heart {
+            transform: scale(0.95);
+        }
+
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            background: rgba(255,255,255,0.7);
+            padding: 8px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <button class="heart-btn" id="colorButton">
+            <div class="heart"></div>
+        </button>
+    </div>
+    <div class="info" id="colorInfo">
+        Нажми на сердечко ❤️
+    </div>
+
+    <script>
+        let button = document.getElementById('colorButton');
+        let infoDiv = document.getElementById('colorInfo');
+        
+        let usedColors = [];
+        
+        let clickCount = 0;
+        
+        function rgbToString(r, g, b) {
+            return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        }
+        
+        function isColorUsed(r, g, b) {
+            let colorString = rgbToString(r, g, b);
+            return usedColors.includes(colorString);
+        }
+        
+        function getUniqueRandomColor() {
+            let maxAttempts = 1000;
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                let r = Math.floor(Math.random() * 256);
+                let g = Math.floor(Math.random() * 256);
+                let b = Math.floor(Math.random() * 256);
+                
+                if (!isColorUsed(r, g, b)) {
+                    usedColors.push(rgbToString(r, g, b));
+                    return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+                }
+                attempts++;
+            }
+            
+            let r = Math.floor(Math.random() * 256);
+            let g = Math.floor(Math.random() * 256);
+            let b = Math.floor(Math.random() * 256);
+            return 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        }
+        
+        button.onclick = function() {
+            let newColor = getUniqueRandomColor();
+            document.body.style.backgroundColor = newColor;
+            
+            clickCount++;
+
+
+            if (clickCount === 50) {
+                infoDiv.innerHTML = "🎉 Ты реально нажала 50 раз? и не надейся, цвет не повторится 💗 🎉";
+            } else {
+                infoDiv.innerHTML = `💗 Нажатий: ${clickCount} | Уникальных цветов: ${usedColors.length}`;
+            }
+
+            let r = parseInt(newColor.split(',')[0].split('(')[1]);
+            let g = parseInt(newColor.split(',')[1]);
+            let b = parseInt(newColor.split(',')[2].split(')')[0]);
+            
+            let brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+            let heartColor = brightness > 128 ? '#ff4d4d' : '#ff9999';
+            
+            let style = document.createElement('style');
+            style.textContent = `
+                .heart::before, .heart::after {
+                    background-color: ${heartColor} !important;
+                }
+            `;
+            let oldStyle = document.querySelector('#dynamic-heart-color');
+            if (oldStyle) oldStyle.remove();
+            style.id = 'dynamic-heart-color';
+            document.head.appendChild(style);
+        }
+    </script>
+</body>
+</html>
